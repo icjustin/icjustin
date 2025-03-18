@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Kids' Calculator Game – Happy/Sad Face Edition</title>
+  <title>Kids' Math Adventure – Super Educational Edition</title>
   <style>
     body {
       margin: 0;
       overflow: hidden;
-      background: linear-gradient(135deg, #ffcccb, #b2ff59, #80deea);
+      background: linear-gradient(135deg, #ffd1dc, #c1ff72, #87ceeb);
       font-family: 'Comic Sans MS', cursive;
     }
     #gameContainer {
@@ -16,22 +16,56 @@
     }
     #ui {
       position: absolute;
-      top: 30px;
-      left: 30px;
+      top: 20px;
+      left: 20px;
       color: #fff;
-      font-size: 40px;
-      text-shadow: 0 0 10px #ffeb3b, 0 0 20px #ffeb3b;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 25px;
+      font-size: 36px;
+      text-shadow: 0 0 8px #ff4081, 0 0 15px #ff4081;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
       border-radius: 20px;
       border: 4px solid #ffeb3b;
     }
     #question {
-      font-size: 60px;
-      margin-bottom: 15px;
+      font-size: 64px;
+      margin-bottom: 10px;
     }
-    #score {
-      font-size: 40px;
+    #feedback {
+      font-size: 32px;
+      color: #ffeb3b;
+      margin-top: 10px;
+    }
+    #score, #stars {
+      font-size: 36px;
+    }
+    #modeSelector {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 15px;
+    }
+    .mode-button {
+      width: 100px;
+      height: 100px;
+      font-size: 24px;
+      background: linear-gradient(135deg, #ffeb3b, #ff9800);
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      box-shadow: 0 8px #ff5722;
+      transition: all 0.2s;
+    }
+    .mode-button:hover {
+      transform: scale(1.1);
+    }
+    .mode-button:active {
+      box-shadow: 0 4px #ff5722;
+      transform: translateY(4px);
+    }
+    .mode-button.selected {
+      background: linear-gradient(135deg, #4caf50, #8bc34a);
+      box-shadow: 0 8px #388e3c;
     }
     #calculator {
       position: absolute;
@@ -41,16 +75,16 @@
       background: rgba(255, 255, 255, 0.95);
       padding: 30px;
       border-radius: 25px;
-      box-shadow: 0 0 30px rgba(255, 235, 59, 0.9);
+      box-shadow: 0 0 40px rgba(255, 235, 59, 1);
     }
     #display {
-      width: 300px;
-      height: 80px;
-      font-size: 40px;
+      width: 350px;
+      height: 90px;
+      font-size: 48px;
       text-align: right;
       padding: 15px;
       margin-bottom: 20px;
-      border: 4px solid #ffeb3b;
+      border: 4px solid #ff4081;
       border-radius: 10px;
       background: #fff;
       box-shadow: inset 0 0 10px #000;
@@ -61,15 +95,15 @@
       margin-bottom: 15px;
     }
     .calc-button {
-      width: 80px;
-      height: 80px;
-      font-size: 36px;
+      width: 90px;
+      height: 90px;
+      font-size: 40px;
       font-family: 'Comic Sans MS', cursive;
       background: linear-gradient(135deg, #ffeb3b, #ff4081);
       border: none;
-      border-radius: 15px;
+      border-radius: 20px;
       cursor: pointer;
-      box-shadow: 0 8px #e91e63;
+      box-shadow: 0 10px #e91e63;
       transition: all 0.2s;
     }
     .calc-button:hover {
@@ -77,25 +111,16 @@
       transform: scale(1.05);
     }
     .calc-button:active {
-      box-shadow: 0 4px #e91e63;
-      transform: translateY(4px);
+      box-shadow: 0 5px #e91e63;
+      transform: translateY(5px);
     }
-    #submit {
+    #submit, #hint {
       background: linear-gradient(135deg, #4caf50, #8bc34a);
       width: 150px;
       font-size: 36px;
     }
-    #submit:hover {
+    #submit:hover, #hint:hover {
       background: linear-gradient(135deg, #8bc34a, #4caf50);
-    }
-    #starBuddy {
-      position: absolute;
-      top: 30px;
-      right: 30px;
-      width: 100px;
-      height: 100px;
-      background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTUwIDUwTDY1IDMwTDcwIDQ1TDg1IDUwTDcwIDU1LDY1IDcwTDUwIDg1TDM1IDcwTDMwIDU1TDIwIDUwTDM1IDQ1TDM1IDMwWiIgZmlsbD0iI2ZmZWIzYiIgc3Ryb2tlPSIjZmY0MDgxIiBzdHJva2Utd2lkdGg9IjQiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI4IiBmaWxsPSIjMDAwIi8+PGRhdGEgbmFtZT0iU21pbGV5IiBmaWxsPSIjMDAwIiBkPSJNNTAgNjBBNCA0IDAgMCAxIDQ2IDY0IDQgNCAwIDAgMSA1MCA2OFoiLz48L3N2Zz4=') no-repeat center;
-      background-size: contain;
     }
   </style>
 </head>
@@ -104,8 +129,14 @@
     <div id="ui">
       <div id="question">3 × 4 = ?</div>
       <div id="score">Score: 0</div>
+      <div id="stars">Stars: ★ 0</div>
+      <div id="feedback"></div>
     </div>
-    <div id="starBuddy"></div>
+    <div id="modeSelector">
+      <button class="mode-button" onclick="setMode('add')">+</button>
+      <button class="mode-button" onclick="setMode('sub')">−</button>
+      <button class="mode-button" onclick="setMode('mul')">×</button>
+    </div>
     <div id="calculator">
       <input type="text" id="display" readonly>
       <div class="button-row">
@@ -126,6 +157,7 @@
       <div class="button-row">
         <button class="calc-button" onclick="appendNumber('0')">0</button>
         <button class="calc-button" onclick="clearDisplay()">C</button>
+        <button id="hint" class="calc-button" onclick="showHint()">Hint</button>
         <button id="submit" class="calc-button" onclick="checkAnswer()">Submit</button>
       </div>
     </div>
@@ -140,7 +172,7 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById("gameContainer").appendChild(renderer.domElement);
 
-    // Background (rotating sphere with sparkles)
+    // Background
     const sphereGeometry = new THREE.SphereGeometry(500, 32, 32);
     const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0x1a2a1a, side: THREE.BackSide });
     const backgroundSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
@@ -148,21 +180,19 @@
 
     // Happy/Sad Face (Star)
     const faceGroup = new THREE.Group();
-    const starGeometry = new THREE.SphereGeometry(50, 32, 32); // Larger star
+    const starGeometry = new THREE.SphereGeometry(60, 32, 32);
     const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffeb3b });
     const star = new THREE.Mesh(starGeometry, starMaterial);
     faceGroup.add(star);
 
-    // Eyes
-    const eyeGeometry = new THREE.SphereGeometry(8, 16, 16);
+    const eyeGeometry = new THREE.SphereGeometry(10, 16, 16);
     const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
     const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-    leftEye.position.set(-15, 10, 40);
+    leftEye.position.set(-20, 15, 50);
     const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-    rightEye.position.set(15, 10, 40);
+    rightEye.position.set(20, 15, 50);
     faceGroup.add(leftEye, rightEye);
 
-    // Mouth (dynamic)
     let mouth;
     function updateMouth(isHappy) {
       if (mouth) faceGroup.remove(mouth);
@@ -171,29 +201,53 @@
       );
       const mouthMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
       mouth = new THREE.Mesh(mouthGeometry, mouthMaterial);
-      mouth.position.set(0, -10, 40);
+      mouth.position.set(0, -15, 50);
       faceGroup.add(mouth);
     }
     function drawSmile() {
       const shape = new THREE.Shape();
-      shape.moveTo(-15, 0);
-      shape.quadraticCurveTo(0, -15, 15, 0);
+      shape.moveTo(-20, 0);
+      shape.quadraticCurveTo(0, -20, 20, 0);
       return shape;
     }
     function drawFrown() {
       const shape = new THREE.Shape();
-      shape.moveTo(-15, 0);
-      shape.quadraticCurveTo(0, 15, 15, 0);
+      shape.moveTo(-20, 0);
+      shape.quadraticCurveTo(0, 20, 20, 0);
       return shape;
     }
-    updateMouth(true); // Start happy
+    updateMouth(true);
 
     faceGroup.position.set(
-      window.innerWidth / 4 - 50, // Bottom-right X (adjusted for camera)
-      50,                        // Y
-      -window.innerHeight / 4    // Bottom-right Z
+      window.innerWidth / 4 - 60,
+      60,
+      -window.innerHeight / 4 + 60
     );
     scene.add(faceGroup);
+
+    // Hint Stars
+    let hintStars = [];
+    function showHint() {
+      hintStars.forEach(s => scene.remove(s));
+      hintStars = [];
+      const count = operation === "×" ? num1 * num2 : operation === "+" ? num1 + num2 : num1;
+      for (let i = 0; i < count; i++) {
+        const geometry = new THREE.SphereGeometry(5, 16, 16);
+        const material = new THREE.MeshBasicMaterial({ color: 0xff4081 });
+        const star = new THREE.Mesh(geometry, material);
+        star.position.set(
+          -100 + (i % 5) * 40,
+          100 - Math.floor(i / 5) * 40,
+          0
+        );
+        hintStars.push(star);
+        scene.add(star);
+      }
+      setTimeout(() => {
+        hintStars.forEach(s => scene.remove(s));
+        hintStars = [];
+      }, 3000);
+    }
 
     // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
@@ -206,7 +260,7 @@
     camera.position.set(0, 150, 300);
     camera.lookAt(0, 0, 0);
 
-    // Particle System for Feedback
+    // Particle System
     let particles = [];
     function createParticles(x, y, z, color) {
       const particleCount = 40;
@@ -240,15 +294,19 @@
 
     // Game Logic
     let score = 0;
+    let starsEarned = 0;
     let num1, num2, operation, correctAnswer;
+    let mode = "add"; // Default mode
     function generateQuestion() {
-      num1 = Math.floor(Math.random() * 9) + 1; // 1-9
-      num2 = Math.floor(Math.random() * 9) + 1; // 1-9
-      const ops = ["+", "-", "×"];
-      operation = ops[Math.floor(Math.random() * ops.length)];
+      num1 = Math.floor(Math.random() * (score < 10 ? 5 : 9)) + 1; // 1-5 initially, then 1-9
+      num2 = Math.floor(Math.random() * (score < 10 ? 5 : 9)) + 1;
+      operation = mode === "add" ? "+" : mode === "sub" ? "-" : "×";
       if (operation === "+") correctAnswer = num1 + num2;
-      else if (operation === "-") correctAnswer = num1 - num2;
-      else correctAnswer = num1 * num2;
+      else if (operation === "-") {
+        num1 = Math.max(num1, num2); // Ensure non-negative
+        num2 = Math.min(num1, num2);
+        correctAnswer = num1 - num2;
+      } else correctAnswer = num1 * num2;
       document.getElementById("question").textContent = `${num1} ${operation} ${num2} = ?`;
     }
     generateQuestion();
@@ -266,13 +324,17 @@
       const userAnswer = parseInt(inputValue);
       if (userAnswer === correctAnswer) {
         score++;
+        starsEarned++;
         document.getElementById("score").textContent = `Score: ${score}`;
-        updateMouth(true); // Happy face
+        document.getElementById("stars").textContent = `Stars: ★ ${starsEarned}`;
+        document.getElementById("feedback").textContent = "Great Job!";
+        updateMouth(true);
         createParticles(faceGroup.position.x, faceGroup.position.y, faceGroup.position.z, 0xffff00);
         generateQuestion();
         clearDisplay();
       } else {
-        updateMouth(false); // Sad face
+        document.getElementById("feedback").textContent = "Try Again!";
+        updateMouth(false);
         let shake = 0;
         const shakeInterval = setInterval(() => {
           faceGroup.rotation.z = Math.sin(shake++ * 0.5) * 0.3;
@@ -283,6 +345,19 @@
         }, 50);
       }
     }
+
+    // Mode Selection
+    const modeButtons = document.querySelectorAll(".mode-button");
+    function setMode(newMode) {
+      mode = newMode;
+      modeButtons.forEach(btn => btn.classList.remove("selected"));
+      if (newMode === "add") modeButtons[0].classList.add("selected");
+      else if (newMode === "sub") modeButtons[1].classList.add("selected");
+      else modeButtons[2].classList.add("selected");
+      generateQuestion();
+      clearDisplay();
+    }
+    modeButtons[0].classList.add("selected"); // Default to addition
 
     // Animation Loop
     function animate() {
