@@ -1,564 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Cosmic Collector</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: linear-gradient(180deg, #1a0033, #000033);
-      font-family: 'Arial', sans-serif;
-    }
-    #gameContainer {
-      width: 100vw;
-      height: 100vh;
-    }
-    #ui {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 20px;
-      color: #fff;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-      z-index: 10;
-    }
-    #score, #timerDisplay {
-      font-size: 32px;
-      font-weight: bold;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 10px 20px;
-      border-radius: 10px;
-      display: inline-block;
-      margin-right: 10px;
-    }
-    /* Start menu styling */
-    #menu {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.8);
-      padding: 30px;
-      border-radius: 15px;
-      color: #fff;
-      text-align: center;
-      z-index: 20;
-    }
-    #menu h1 {
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
-    #menu label {
-      font-size: 24px;
-    }
-    #menu select, #menu input {
-      font-size: 24px;
-      padding: 5px;
-      margin: 10px;
-    }
-    #menu button {
-      font-size: 24px;
-      padding: 10px 20px;
-      margin-top: 20px;
-      cursor: pointer;
-      border: none;
-      border-radius: 10px;
-      background: #00aaff;
-      color: #fff;
-    }
-    /* Game Over screen styling */
-    #gameOver {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.8);
-      padding: 30px;
-      border-radius: 15px;
-      color: #fff;
-      text-align: center;
-      z-index: 30;
-      display: none;
-    }
-    #gameOver h1 {
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
-    #gameOver button {
-      font-size: 24px;
-      padding: 10px 20px;
-      cursor: pointer;
-      border: none;
-      border-radius: 10px;
-      background: #00aaff;
-      color: #fff;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Hub</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        /* Full-screen background */
+        body {
+            background: url('https://source.unsplash.com/1600x900/?gaming') no-repeat center center/cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+
+        /* Main container */
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Title */
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        /* Game Links */
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* Buttons */
+        .game-link {
+            display: inline-block;
+            padding: 12px 25px;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .game-link:hover {
+            background: linear-gradient(45deg, #ff9800, #ff5722);
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.8);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body>
-  <!-- UI Elements -->
-  <div id="ui">
-    <div id="score">Score: 0</div>
-    <div id="timerDisplay">Time: 60</div>
-  </div>
-  <!-- Menu for game start and timer selection -->
-  <div id="menu">
-    <h1>Cosmic Collector</h1>
-    <label for="duration">Select Duration:</label>
-    <select id="duration">
-      <option value="60">1 Minute</option>
-      <option value="120">2 Minutes</option>
-      <option value="180">3 Minutes</option>
-    </select>
-    <br>
-    <button id="startButton">Start Game</button>
-  </div>
-  <!-- Game Over screen -->
-  <div id="gameOver">
-    <h1>Game Over!</h1>
-    <p id="finalScore"></p>
-    <button id="restartButton">Play Again</button>
-  </div>
-  <div id="gameContainer"></div>
+    <div class="container">
+        <h1>🎮 Welcome to Game Hub 🎮</h1>
+        <p>Select a game to play:</p>
+        
+        <div class="links">
+            <a href="tank.html" class="game-link">🚀 Play Tank Battle</a>
+            <a href="collector.html" class="game-link">🔵 Play Collector Game</a>
+        </div>
 
-  <!-- Three.js library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script>
-    /* --- Audio Generation --- */
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    function playGeneratedSound(frequency, duration, volume) {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      oscillator.type = 'sine';
-      oscillator.frequency.value = frequency;
-      gainNode.gain.value = volume;
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + duration);
-    }
-
-    // Background music with a revving engine feel.
-    let bgOscillator, bgGain;
-    function startBackgroundMusic() {
-      bgOscillator = audioContext.createOscillator();
-      bgGain = audioContext.createGain();
-      bgOscillator.connect(bgGain);
-      bgGain.connect(audioContext.destination);
-      bgOscillator.type = 'sawtooth'; // Motorcycle engine-like sound.
-      bgOscillator.frequency.value = 220;
-      bgGain.gain.value = 0.2;
-      bgOscillator.start();
-    }
-    function stopBackgroundMusic() {
-      if(bgOscillator) {
-        bgOscillator.stop();
-        bgOscillator = null;
-      }
-    }
-
-    /* --- Game Over Sound (Mario Classic Style) --- */
-    function playGameOverSound() {
-      const now = audioContext.currentTime;
-      const toneSequence = [
-        { frequency: 300, duration: 0.15 },
-        { frequency: 250, duration: 0.15 },
-        { frequency: 200, duration: 0.15 },
-        { frequency: 150, duration: 0.15 },
-        { frequency: 100, duration: 0.2 },
-      ];
-      toneSequence.forEach((tone, index) => {
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(tone.frequency, now + index * tone.duration);
-        gainNode.gain.setValueAtTime(0.5, now + index * tone.duration);
-        gainNode.gain.linearRampToValueAtTime(0, now + (index + 1) * tone.duration);
-        oscillator.start(now + index * tone.duration);
-        oscillator.stop(now + (index + 1) * tone.duration);
-      });
-    }
-
-    /* --- Three.js Scene Setup --- */
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('gameContainer').appendChild(renderer.domElement);
-
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040);
-    scene.add(ambientLight);
-    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-    pointLight.position.set(0, 10, 10);
-    scene.add(pointLight);
-
-    /* --- Player (Spaceship) --- */
-    const player = new THREE.Group();
-    const bodyGeometry = new THREE.ConeGeometry(0.7, 2, 32);
-    const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x00aaff, specular: 0xffffff, shininess: 50 });
-    const bodyMesh = new THREE.Mesh(bodyGeometry, bodyMaterial);
-    bodyMesh.rotation.x = Math.PI;
-    player.add(bodyMesh);
-    const cockpitGeometry = new THREE.SphereGeometry(0.4, 32, 32);
-    const cockpitMaterial = new THREE.MeshPhongMaterial({ color: 0xffff66, specular: 0xffffff, shininess: 60, transparent: true, opacity: 0.8 });
-    const cockpitMesh = new THREE.Mesh(cockpitGeometry, cockpitMaterial);
-    cockpitMesh.position.y = 0.5;
-    player.add(cockpitMesh);
-    const wingGeometry = new THREE.BoxGeometry(0.1, 0.5, 1.2);
-    const wingMaterial = new THREE.MeshPhongMaterial({ color: 0x00aaff, specular: 0xffffff, shininess: 30 });
-    const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
-    leftWing.position.set(-0.8, -0.2, 0);
-    leftWing.rotation.z = Math.PI / 12;
-    player.add(leftWing);
-    const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
-    rightWing.position.set(0.8, -0.2, 0);
-    rightWing.rotation.z = -Math.PI / 12;
-    player.add(rightWing);
-    const boosterGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.8, 32);
-    const boosterMaterial = new THREE.MeshPhongMaterial({ color: 0xffaa00, specular: 0xffaa00, shininess: 20, emissive: 0xff6600 });
-    const boosterMesh = new THREE.Mesh(boosterGeometry, boosterMaterial);
-    boosterMesh.rotation.x = Math.PI / 2;
-    boosterMesh.position.set(0, -1.2, 0);
-    player.add(boosterMesh);
-    const glowGeometry = new THREE.SphereGeometry(0.55, 32, 32);
-    const glowMaterial = new THREE.MeshBasicMaterial({ color: 0xffff66, transparent: true, opacity: 0.3 });
-    const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
-    cockpitMesh.add(glowMesh);
-    scene.add(player);
-    player.position.y = -4;
-
-    /* --- Star Field --- */
-    const starsGeometry = new THREE.BufferGeometry();
-    const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
-    const starVertices = [];
-    for (let i = 0; i < 1000; i++) {
-      starVertices.push((Math.random() - 0.5) * 50, (Math.random() - 0.5) * 50, (Math.random() - 0.5) * 50);
-    }
-    starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-    const stars = new THREE.Points(starsGeometry, starsMaterial);
-    scene.add(stars);
-
-    /* --- Game Variables --- */
-    let score = 0;
-    const collectibles = [];
-    const enemies = [];
-    const baseSpeed = 0.05;
-    let gameSpeed = baseSpeed;
-    let gameRunning = false;
-    let gameDuration = 60;
-    let timeRemaining = gameDuration;
-    let timerInterval = null;
-
-    const scoreDisplay = document.getElementById('score');
-    const timerDisplay = document.getElementById('timerDisplay');
-    const menu = document.getElementById('menu');
-    const startButton = document.getElementById('startButton');
-    const gameOverScreen = document.getElementById('gameOver');
-    const finalScoreDisplay = document.getElementById('finalScore');
-    const restartButton = document.getElementById('restartButton');
-
-    camera.position.z = 8;
-
-    /* --- Player Controls --- */
-    let moveLeft = false;
-    let moveRight = false;
-    document.addEventListener('keydown', (event) => {
-      if (!gameRunning) return;
-      if (event.key === 'ArrowLeft') moveLeft = true;
-      if (event.key === 'ArrowRight') moveRight = true;
-    });
-    document.addEventListener('keyup', (event) => {
-      if (event.key === 'ArrowLeft') moveLeft = false;
-      if (event.key === 'ArrowRight') moveRight = false;
-    });
-
-    /* --- Enhanced Particle Effects --- */
-    function createParticleEffect(position, color) {
-      const particles = new THREE.Group();
-      const particleGeo = new THREE.SphereGeometry(0.05, 8, 8);
-      const particleMat = new THREE.MeshBasicMaterial({ color: color });
-      // Create 50 particles for a denser effect.
-      for (let i = 0; i < 50; i++) {
-        const particle = new THREE.Mesh(particleGeo, particleMat.clone());
-        particle.position.copy(position);
-        // Assign a random velocity vector.
-        particle.userData.velocity = new THREE.Vector3(
-          (Math.random() - 0.5) * 0.2,
-          (Math.random() - 0.5) * 0.2,
-          (Math.random() - 0.5) * 0.2
-        );
-        particles.add(particle);
-      }
-      scene.add(particles);
-      const startTime = performance.now();
-      const lifetime = 1500; // milliseconds.
-      function animateParticles() {
-        const elapsed = performance.now() - startTime;
-        if (elapsed < lifetime) {
-          particles.children.forEach(p => {
-            p.position.add(p.userData.velocity);
-            p.userData.velocity.multiplyScalar(0.98);
-            const t = elapsed / lifetime;
-            p.material.opacity = 1 - t;
-            p.material.transparent = true;
-            p.scale.setScalar(1 - t);
-          });
-          requestAnimationFrame(animateParticles);
-        } else {
-          scene.remove(particles);
-        }
-      }
-      animateParticles();
-    }
-
-    /* --- Collectible (Diamond) --- */
-    function createCollectible() {
-      const geometry = new THREE.DodecahedronGeometry(0.5);
-      const material = new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff, specular: 0xffffff, shininess: 50 });
-      const collectible = new THREE.Mesh(geometry, material);
-      collectible.position.x = (Math.random() - 0.5) * 8;
-      collectible.position.y = 6;
-      scene.add(collectible);
-      collectibles.push(collectible);
-    }
-
-    /* --- Enemy Types --- */
-    function createEnemy() {
-      const enemyType = Math.floor(Math.random() * 3);
-      let enemy;
-      switch(enemyType) {
-        case 0: // Monster Alien
-          enemy = new THREE.Group();
-          const bodyGeo = new THREE.SphereGeometry(0.6, 32, 32);
-          const bodyMat = new THREE.MeshPhongMaterial({ color: 0x00aa00, specular: 0x006600, shininess: 30 });
-          const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-          enemy.add(bodyMesh);
-          const hornGeo = new THREE.ConeGeometry(0.2, 0.5, 16);
-          const hornMat = new THREE.MeshPhongMaterial({ color: 0x006600, specular: 0x004400, shininess: 20 });
-          const leftHorn = new THREE.Mesh(hornGeo, hornMat);
-          leftHorn.position.set(-0.2, 0.5, 0);
-          leftHorn.rotation.z = Math.PI / 8;
-          enemy.add(leftHorn);
-          const rightHorn = new THREE.Mesh(hornGeo, hornMat);
-          rightHorn.position.set(0.2, 0.5, 0);
-          rightHorn.rotation.z = -Math.PI / 8;
-          enemy.add(rightHorn);
-          const eyeGeo = new THREE.SphereGeometry(0.1, 8, 8);
-          const eyeMat = new THREE.MeshPhongMaterial({ color: 0x000000 });
-          const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-          leftEye.position.set(-0.15, 0.2, 0.5);
-          enemy.add(leftEye);
-          const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-          rightEye.position.set(0.15, 0.2, 0.5);
-          enemy.add(rightEye);
-          const expression = Math.random();
-          if (expression < 0.33) {
-              const mouthGeo = new THREE.TorusGeometry(0.15, 0.03, 8, 16, Math.PI);
-              const mouthMat = new THREE.MeshPhongMaterial({ color: 0x000000 });
-              const mouth = new THREE.Mesh(mouthGeo, mouthMat);
-              mouth.position.set(0, -0.1, 0.5);
-              mouth.rotation.x = Math.PI;
-              enemy.add(mouth);
-          } else if (expression < 0.66) {
-              const mouthGeo = new THREE.TorusGeometry(0.15, 0.03, 8, 16, Math.PI);
-              const mouthMat = new THREE.MeshPhongMaterial({ color: 0x000000 });
-              const mouth = new THREE.Mesh(mouthGeo, mouthMat);
-              mouth.position.set(0, 0.1, 0.5);
-              enemy.add(mouth);
-          } else {
-              const mouthGeo = new THREE.SphereGeometry(0.08, 8, 8);
-              const mouthMat = new THREE.MeshPhongMaterial({ color: 0x000000 });
-              const mouth = new THREE.Mesh(mouthGeo, mouthMat);
-              mouth.position.set(0, 0, 0.55);
-              enemy.add(mouth);
-          }
-          break;
-        case 1: // Flying Saucer
-          enemy = new THREE.Group();
-          const saucerGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.2, 32);
-          const saucerMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, specular: 0x880000, shininess: 20 });
-          const saucerBody = new THREE.Mesh(saucerGeometry, saucerMaterial);
-          enemy.add(saucerBody);
-          const domeGeometry = new THREE.SphereGeometry(0.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
-          const domeMaterial = new THREE.MeshPhongMaterial({ color: 0xff6666, specular: 0x882222, shininess: 30, transparent: true, opacity: 0.8 });
-          const dome = new THREE.Mesh(domeGeometry, domeMaterial);
-          dome.position.y = 0.1;
-          enemy.add(dome);
-          break;
-        case 2: // Tentacle Enemy
-          enemy = new THREE.Group();
-          const cubeGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
-          const cubeMaterial = new THREE.MeshPhongMaterial({ color: 0x9900ff, specular: 0x550077, shininess: 40 });
-          const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-          enemy.add(cube);
-          for (let i = 0; i < 4; i++) {
-             const armGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.6, 8);
-             const armMaterial = new THREE.MeshPhongMaterial({ color: 0x9900ff, specular: 0x550077, shininess: 30 });
-             const arm = new THREE.Mesh(armGeometry, armMaterial);
-             if (i === 0) { arm.position.set(-0.5, 0, 0); arm.rotation.z = Math.PI/2; }
-             else if (i === 1) { arm.position.set(0.5, 0, 0); arm.rotation.z = Math.PI/2; }
-             else if (i === 2) { arm.position.set(0, 0.5, 0); }
-             else { arm.position.set(0, -0.5, 0); }
-             enemy.add(arm);
-          }
-          break;
-      }
-      enemy.position.x = (Math.random() - 0.5) * 8;
-      enemy.position.y = 6;
-      scene.add(enemy);
-      enemies.push(enemy);
-    }
-
-    /* --- Timer --- */
-    function startTimer() {
-      timerDisplay.textContent = `Time: ${timeRemaining}`;
-      timerInterval = setInterval(() => {
-        timeRemaining--;
-        timerDisplay.textContent = `Time: ${timeRemaining}`;
-        if (timeRemaining <= 0) {
-          clearInterval(timerInterval);
-          endGame();
-        }
-      }, 1000);
-    }
-
-    /* --- End Game --- */
-    function endGame() {
-      gameRunning = false;
-      if(timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-      stopBackgroundMusic();
-      gameOverScreen.style.display = 'block';
-      finalScoreDisplay.textContent = `Final Score: ${score}`;
-    }
-
-    /* --- Reset Game --- */
-    function resetGame() {
-      collectibles.forEach(c => scene.remove(c));
-      collectibles.length = 0;
-      enemies.forEach(e => scene.remove(e));
-      enemies.length = 0;
-      score = 0;
-      gameSpeed = baseSpeed;
-      scoreDisplay.textContent = `Score: ${score}`;
-      timeRemaining = gameDuration;
-      player.position.x = 0;
-      if(timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-      stopBackgroundMusic();
-    }
-
-    /* --- Main Game Loop --- */
-    let time = 0;
-    function animate() {
-      if (!gameRunning) return;
-      requestAnimationFrame(animate);
-      time += 0.05;
-      gameSpeed = baseSpeed + score * 0.0005;
-      if(bgOscillator) {
-        bgOscillator.frequency.value = 220 + score * 0.5;
-        bgGain.gain.value = Math.min(0.5, 0.2 + score * 0.001);
-      }
-      
-      // Calculate boundaries based on camera view.
-      const distance = Math.abs(camera.position.z - player.position.z);
-      const halfHeight = distance * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-      const halfWidth = halfHeight * camera.aspect;
-      const margin = 0.5;
-      
-      // --- Simple Player Movement ---
-      if (moveLeft && player.position.x > -halfWidth + margin) {
-        player.position.x -= 0.1;
-      }
-      if (moveRight && player.position.x < halfWidth - margin) {
-        player.position.x += 0.1;
-      }
-      
-      player.rotation.z = Math.sin(time) * 0.2;
-
-      // Update collectibles.
-      collectibles.forEach((collectible, index) => {
-        collectible.position.y -= gameSpeed;
-        collectible.rotation.x += 0.1;
-        collectible.rotation.y += 0.1;
-        if (Math.abs(collectible.position.x - player.position.x) < 1 &&
-            Math.abs(collectible.position.y - player.position.y) < 1.5) {
-          playGeneratedSound(600, 0.1, 0.5);
-          createParticleEffect(collectible.position, 0xffffff);
-          scene.remove(collectible);
-          collectibles.splice(index, 1);
-          score += 10;
-          scoreDisplay.textContent = `Score: ${score}`;
-          player.scale.set(1.2, 1.2, 1.2);
-          setTimeout(() => player.scale.set(1, 1, 1), 100);
-        }
-        if (collectible.position.y < -6) {
-          scene.remove(collectible);
-          collectibles.splice(index, 1);
-        }
-      });
-      
-      // Update enemies.
-      enemies.forEach((enemy, index) => {
-        enemy.position.y -= gameSpeed;
-        enemy.rotation.x += 0.05;
-        enemy.rotation.y += 0.05;
-        if (Math.abs(enemy.position.x - player.position.x) < 1 &&
-            Math.abs(enemy.position.y - player.position.y) < 1.5) {
-          playGameOverSound();
-          createParticleEffect(enemy.position, 0x00aa00);
-          endGame();
-        }
-        if (enemy.position.y < -6) {
-          scene.remove(enemy);
-          enemies.splice(index, 1);
-        }
-      });
-      
-      if (Math.random() < 0.03) createCollectible();
-      if (Math.random() < 0.01) createEnemy();
-      stars.rotation.y += 0.001;
-      renderer.render(scene, camera);
-    }
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    startButton.addEventListener('click', () => {
-      const durationSelect = document.getElementById('duration');
-      gameDuration = parseInt(durationSelect.value);
-      resetGame();
-      menu.style.display = 'none';
-      gameOverScreen.style.display = 'none';
-      gameRunning = true;
-      audioContext.resume();
-      startBackgroundMusic();
-      startTimer();
-      animate();
-    });
-
-    restartButton.addEventListener('click', () => {
-      menu.style.display = 'block';
-      gameOverScreen.style.display = 'none';
-    });
-
-    /* Further enhancement suggestions:
-       - Add power-ups (e.g., shields, multipliers, extra time).
-       - Implement level progression with new enemy types and backgrounds.
-       - Add achievements or high score tracking.
-       - Further adjust particle animations for different explosion types.
-    */
-  </script>
+        <p class="footer">Made with ❤️ by [Your Name]</p>
+    </div>
 </body>
 </html>
