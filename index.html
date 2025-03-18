@@ -4,28 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Hub - Matrix Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
     <style>
-        /* Reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Courier New', monospace;
         }
-        
-        /* Full-screen animated Matrix background */
-        body {
-            background: black;
+
+        body, html {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            text-align: center;
-            color: #00ff00;
+            font-family: 'Orbitron', monospace;
+            color: #00FF41;
+            background-color: #000;
+            position: relative;
         }
 
-        /* Matrix effect */
         canvas {
             position: absolute;
             top: 0;
@@ -35,113 +36,125 @@
             z-index: -1;
         }
 
-        /* Main container */
         .container {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
-            animation: glow 2s infinite alternate;
+            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 0 25px #00FF41;
+            padding: 30px;
+            max-width: 500px;
+            text-align: center;
+            animation: pulseGlow 2s infinite alternate;
         }
 
-        @keyframes glow {
-            from { box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
-            to { box-shadow: 0 0 20px rgba(0, 255, 0, 1); }
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 10px #00FF41; }
+            to { box-shadow: 0 0 30px #00FF41; }
         }
 
-        /* Title */
         h1 {
-            font-size: 42px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px #00ff00;
+            font-size: 38px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px #00FF41;
         }
 
-        /* Game Links */
+        p {
+            font-size: 16px;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px #00FF41;
+        }
+
         .links {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            margin-top: 20px;
+            gap: 15px;
         }
 
-        /* Buttons */
         .game-link {
-            display: inline-block;
-            padding: 15px 30px;
-            font-size: 22px;
+            display: block;
+            padding: 12px;
+            font-size: 20px;
             font-weight: bold;
-            text-decoration: none;
             color: #000;
-            background: linear-gradient(45deg, #00ff00, #009900);
-            border: 2px solid #00ff00;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.3s;
-            text-shadow: 0 0 5px #000;
+            background-image: linear-gradient(135deg, #00FF41, #005F20);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: transform 0.3s, background-image 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
         }
 
         .game-link:hover {
-            background: linear-gradient(45deg, #009900, #00ff00);
             transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(0, 255, 0, 1);
+            background-image: linear-gradient(135deg, #005F20, #00FF41);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 1);
         }
 
-        /* Footer */
         .footer {
-            margin-top: 20px;
+            margin-top: 25px;
             font-size: 14px;
-            opacity: 0.8;
-            text-shadow: 0 0 5px #00ff00;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 90%;
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <canvas id="matrixCanvas"></canvas>
+
     <div class="container">
-        <h1>- Welcome to Game Hub - </h1>
-        <p>Select a game to enter the grid:</p>
-        
+        <h1>&lt; Enter the Matrix &gt;</h1>
+        <p>Select your game:</p>
+
         <div class="links">
-            <a href="tank.html" class="game-link">🚀 Play Tank Battle</a>
-            <a href="collector.html" class="game-link">🔵 Play Collector Game</a>
-			<a href="caculator.html" class="game-link">📱 Beat Numbers</a>
+            <a href="tank.html" class="game-link">🚀 Tank Battle</a>
+            <a href="collector.html" class="game-link">🔵 Collector Game</a>
+            <a href="numbers.html" class="game-link">📱 Beat Numbers</a>
         </div>
 
-        <p class="footer">Made with 💚 by Hoang Nguyen</p>
+        <p class="footer">Crafted with 💚 by Hoang Nguyen</p>
     </div>
 
     <script>
-        // Matrix effect
         const canvas = document.getElementById("matrixCanvas");
         const ctx = canvas.getContext("2d");
 
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        const fontSize = 16;
-        const columns = canvas.width / fontSize;
-        const drops = Array(Math.floor(columns)).fill(1);
+        const matrixChars = "アァカサタナハマヤャラワヲン0123456789";
+        const fontSize = 18;
+        const columns = Math.floor(canvas.width / fontSize);
+        const drops = Array(columns).fill(0);
 
         function drawMatrix() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#00ff00";
+
+            ctx.fillStyle = "#00FF41";
             ctx.font = fontSize + "px monospace";
 
             for (let i = 0; i < drops.length; i++) {
                 const text = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                
+
                 if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
                     drops[i] = 0;
                 }
-
                 drops[i]++;
             }
         }
 
-        setInterval(drawMatrix, 50);
+        setInterval(drawMatrix, 45);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
     </script>
 </body>
 </html>
