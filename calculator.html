@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kids' Calculator Game – Happy/Sad Edition</title>
+  <title>Kids' Calculator Game – Racing Edition</title>
   <style>
     * {
       margin: 0;
@@ -11,171 +11,244 @@
       box-sizing: border-box;
     }
     html, body {
-      height: 100%;
-      overflow: hidden;
-      font-family: 'Comic Neue', 'Arial', sans-serif;
-      background: linear-gradient(135deg, #ffeb3b, #ffca28);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden; /* Remove scrollbar */
+      font-family: 'Bubblegum Sans', 'Arial', sans-serif;
+      background: linear-gradient(135deg, #ff6f61, #ffcc5c);
       color: #333;
-      touch-action: manipulation; /* Prevents double-tap zooming */
+      touch-action: manipulation;
     }
     #gameContainer {
-      height: 100%;
-      width: 100%;
-      max-width: 100%;
-      margin: 0 auto;
+      height: 100vh;
+      width: 100vw;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      background: url('https://www.transparenttextures.com/patterns/circles.png'), rgba(255, 255, 255, 0.8);
+      padding: 5px;
+      background: url('https://www.transparenttextures.com/patterns/circles.png'), rgba(255, 255, 255, 0.9);
     }
-    #face {
-      width: 100px;
-      height: 100px;
-      background: #4caf50;
-      border-radius: 50%;
+    #raceTrack {
+      width: 100%;
+      padding: 5px;
+      background: #f5f5d5;
+      border: 3px solid #000;
       position: relative;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-      transition: all 0.4s ease;
-      flex-shrink: 0;
-      margin-top: 10px;
+      flex: 0 0 70px; /* Fixed height for track */
     }
-    #face.happy { background: #4caf50; }
-    #face.sad { background: #f44336; }
-    .eye {
-      width: 18px;
-      height: 18px;
-      background: #fff;
-      border-radius: 50%;
-      position: absolute;
-      top: 25px;
-      box-shadow: inset 0 0 3px rgba(0,0,0,0.3);
+    .track-container {
+      position: relative;
+      margin: 5px 0;
     }
-    .eye.left { left: 25px; }
-    .eye.right { right: 25px; }
-    #mouth {
+    .track {
+      position: relative;
+      height: 50px;
+      width: 100%;
+      border-top: 3px solid #000;
+      border-bottom: 3px solid #000;
+      background: linear-gradient(to right, #90ee90, #f5f5d5); /* Light green to beige gradient */
+    }
+    .car {
       position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 5px;
       width: 50px;
-      height: 25px;
-      background: #fff;
-      transition: all 0.4s ease;
+      height: 40px;
+      background: url('https://img.icons8.com/color/48/000000/car.png') no-repeat center;
+      background-size: contain;
+      transition: left 0.5s ease;
     }
-    #face.happy #mouth {
-      bottom: 15px;
-      border-radius: 0 0 25px 25px;
+    .car.wiggle {
+      animation: wiggle 0.5s ease;
     }
-    #face.sad #mouth {
-      bottom: 15px;
-      border-radius: 25px 25px 0 0;
-      transform: translateX(-50%) rotate(180deg);
+    @keyframes wiggle {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+      75% { transform: rotate(-5deg); }
+      100% { transform: rotate(0deg); }
+    }
+    #finishLine {
+      position: absolute;
+      top: 0;
+      right: 0; /* Always at the end of the screen */
+      width: 12px;
+      height: 100%;
+      background: repeating-linear-gradient(
+        45deg,
+        #000,
+        #000 6px,
+        #fff 6px,
+        #fff 12px
+      ); /* Checkered pattern */
+      border-left: 3px solid #000;
+      border-right: 3px solid #000;
+      z-index: 10;
     }
     #ui {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 5px;
       border-radius: 15px;
       border: 3px solid #2196f3;
       text-align: center;
       width: 100%;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-      flex-shrink: 0;
-      margin: 10px 0;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      flex: 0 0 auto; /* Adjust height dynamically */
     }
     #question {
       font-size: 2.5rem;
       font-weight: 700;
       color: #e91e63;
       margin-bottom: 5px;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+      text-shadow: 2px 2px 3px rgba(0,0,0,0.2);
     }
     #score {
       font-size: 1.5rem;
       color: #2196f3;
       font-weight: 700;
+      margin-bottom: 5px;
     }
+    #countdown {
+      font-size: 1.5rem;
+      color: #d81b60;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    #settings {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 5px;
+    }
+    #goalInput, #countdownInput {
+      width: 70px;
+      padding: 5px;
+      font-size: 1.2rem;
+      border: 3px solid #2196f3;
+      border-radius: 10px;
+      text-align: center;
+      background: #fff;
+      color: #333;
+    }
+    #startBtn {
+      padding: 8px 20px;
+      font-size: 1.5rem;
+      background: #4caf50;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px #388e3c;
+      margin: 0 5px;
+    }
+    #startBtn:hover {
+      background: #81c784;
+      transform: scale(1.1);
+    }
+    #startBtn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px #388e3c;
+    }
+    #startBtn:disabled {
+      background: #ccc;
+      box-shadow: 0 2px #999;
+      transform: none;
+    }
+    #setGoalBtn, #setCountdownBtn {
+      padding: 5px 10px;
+      font-size: 1.2rem;
+      background: #ff9800;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 3px #e65100;
+    }
+    #setGoalBtn:hover, #setCountdownBtn:hover { transform: scale(1.1); }
+    #setGoalBtn:active, #setCountdownBtn:active { transform: translateY(2px); box-shadow: 0 1px #e65100; }
     #operationSelector {
-      margin-top: 5px;
       display: flex;
       justify-content: center;
       gap: 10px;
+      margin-bottom: 5px;
     }
     .op-button {
       width: 50px;
       height: 50px;
-      font-size: 1.5rem;
-      background: #ff9800;
+      font-size: 1.8rem;
       border: none;
-      border-radius: 10px;
+      border-radius: 15px;
       color: #fff;
       cursor: pointer;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 3px #e65100;
+      box-shadow: 0 4px rgba(0, 0, 0, 0.3);
     }
+    .op-button[data-op="+"] { background: #4caf50; }
+    .op-button[data-op="-"] { background: #ff5722; }
+    .op-button[data-op="×"] { background: #2196f3; }
     .op-button:hover {
       transform: scale(1.1);
-      box-shadow: 0 0 8px rgba(255, 152, 0, 0.7);
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
     }
     .op-button:active {
       transform: translateY(2px);
-      box-shadow: 0 1px #e65100;
+      box-shadow: 0 2px rgba(0, 0, 0, 0.3);
     }
     .op-button.active {
       background: #d81b60;
-      box-shadow: 0 3px #ad1457;
+      box-shadow: 0 4px #ad1457;
     }
     #calculator {
       width: 100%;
       background: rgba(255, 255, 255, 0.95);
-      padding: 10px;
+      padding: 5px;
       border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-      flex-grow: 1;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      border: 3px solid #2196f3;
+      flex: 1; /* Take remaining space */
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      border: 2px solid #2196f3;
     }
     #display {
       width: 100%;
-      height: 60px;
-      font-size: 2.5rem;
+      height: 50px;
+      font-size: 2.2rem;
       text-align: right;
-      padding: 10px;
+      padding: 5px;
       border: 3px solid #2196f3;
-      border-radius: 10px;
+      border-radius: 15px;
       background: #e3f2fd;
       color: #333;
-      margin-bottom: 10px;
+      margin-bottom: 5px;
       outline: none;
       font-weight: 700;
-      box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+      box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
     }
     .button-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      flex-grow: 1;
+      gap: 5px;
+      flex: 1; /* Expand to fill remaining space */
     }
     .calc-button {
       padding: 0;
       font-size: 2rem;
       background: #2196f3;
       border: none;
-      border-radius: 10px;
+      border-radius: 15px;
       color: #fff;
       cursor: pointer;
       box-shadow: 0 4px #1565c0;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 60px; /* Larger touch target */
+      height: 100%; /* Fill grid cell */
     }
     .calc-button:hover {
       background: #42a5f5;
@@ -188,55 +261,122 @@
     #clear {
       background: #ff5722;
       box-shadow: 0 4px #d84315;
+      font-size: 1.5rem;
     }
     #clear:hover { background: #ff8a65; }
     #clear:active { box-shadow: 0 2px #d84315; }
     #submit {
       background: #4caf50;
       box-shadow: 0 4px #388e3c;
+      font-size: 1.5rem;
     }
     #submit:hover { background: #81c784; }
     #submit:active { box-shadow: 0 2px #388e3c; }
 
+    /* Custom Dialog Box */
+    #dialogOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    #dialogBox {
+      background: #fff;
+      padding: 20px;
+      border-radius: 20px;
+      border: 5px solid #2196f3;
+      text-align: center;
+      max-width: 80%;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      animation: pop 0.3s ease;
+    }
+    #dialogMessage {
+      font-size: 1.8rem;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    #dialogClose {
+      padding: 8px 20px;
+      font-size: 1.2rem;
+      background: #ff9800;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 3px #e65100;
+    }
+    #dialogClose:hover {
+      background: #ffb74d;
+      transform: scale(1.05);
+    }
+    #dialogClose:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px #e65100;
+    }
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
     @media (max-width: 400px) {
-      #gameContainer { padding: 5px; }
-      #face { width: 80px; height: 80px; }
-      .eye { width: 14px; height: 14px; top: 20px; }
-      .eye.left { left: 20px; }
-      .eye.right { right: 20px; }
-      #mouth { width: 40px; height: 20px; bottom: 10px; }
+      #gameContainer { padding: 3px; }
       #question { font-size: 2rem; }
-      #score { font-size: 1.2rem; }
-      #display { font-size: 2rem; height: 50px; }
-      .calc-button { font-size: 1.8rem; min-height: 50px; }
-      .op-button { width: 40px; height: 40px; font-size: 1.2rem; }
+      #score, #countdown { font-size: 1.2rem; }
+      #display { font-size: 1.8rem; height: 40px; }
+      .calc-button { font-size: 1.5rem; }
+      .op-button { width: 40px; height: 40px; font-size: 1.5rem; }
+      .car { width: 40px; height: 30px; }
+      .track { height: 40px; }
+      #goalInput, #countdownInput { width: 60px; font-size: 1rem; }
+      #setGoalBtn, #setCountdownBtn { font-size: 1rem; padding: 3px 8px; }
+      #startBtn { font-size: 1.2rem; padding: 5px 15px; }
+      #raceTrack { flex: 0 0 60px; }
+      #dialogMessage { font-size: 1.5rem; }
+      #dialogClose { font-size: 1rem; padding: 5px 15px; }
     }
     @media (max-height: 600px) {
-      #gameContainer { padding: 5px; }
-      #face { width: 70px; height: 70px; }
-      .eye { width: 12px; height: 12px; top: 18px; }
-      .eye.left { left: 18px; }
-      .eye.right { right: 18px; }
-      #mouth { width: 35px; height: 18px; bottom: 8px; }
+      #gameContainer { padding: 3px; }
       #question { font-size: 1.8rem; }
-      #score { font-size: 1rem; }
-      #display { font-size: 1.8rem; height: 40px; }
-      .calc-button { font-size: 1.6rem; min-height: 45px; }
-      .op-button { width: 35px; height: 35px; font-size: 1rem; }
+      #score, #countdown { font-size: 1rem; }
+      #display { font-size: 1.6rem; height: 35px; }
+      .calc-button { font-size: 1.3rem; }
+      .op-button { width: 35px; height: 35px; font-size: 1.3rem; }
+      .car { width: 35px; height: 25px; }
+      .track { height: 35px; }
+      #raceTrack { flex: 0 0 50px; }
+      #dialogMessage { font-size: 1.3rem; }
+      #dialogClose { font-size: 0.9rem; padding: 5px 10px; }
     }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="gameContainer">
-    <div id="face">
-      <div class="eye left"></div>
-      <div class="eye right"></div>
-      <div id="mouth"></div>
+    <div id="raceTrack">
+      <div id="finishLine"></div>
+      <div class="track-container">
+        <div class="track" id="track">
+          <div class="car" id="car"></div>
+        </div>
+      </div>
     </div>
     <div id="ui">
       <div id="question">3 × 4 = ?</div>
       <div id="score">Score: 0</div>
+      <div id="countdown">Time: 2:00</div>
+      <div id="settings">
+        <input type="number" id="goalInput" min="5" max="50" value="10">
+        <button id="setGoalBtn" onclick="setGoal()">Set Goal</button>
+        <input type="number" id="countdownInput" min="1" max="10" value="1">
+        <button id="setCountdownBtn" onclick="setCountdown()">Set Time (min)</button>
+        <button id="startBtn" onclick="startGame()">Start</button>
+      </div>
       <div id="operationSelector">
         <button class="op-button" data-op="+">+</button>
         <button class="op-button" data-op="-">-</button>
@@ -256,21 +396,109 @@
         <button class="calc-button" onclick="appendNumber('8')">8</button>
         <button class="calc-button" onclick="appendNumber('9')">9</button>
         <button class="calc-button" onclick="appendNumber('0')">0</button>
-        <button id="clear" class="calc-button" onclick="clearDisplay()">C</button>
+        <button id="clear" class="calc-button" onclick="clearDisplay()">✖</button>
         <button id="submit" class="calc-button" onclick="checkAnswer()">✔</button>
       </div>
     </div>
   </div>
 
-  <script>
-    const correctSound = new Audio('https://www.myinstants.com/media/sounds/correct.mp3');
-    const wrongSound = new Audio('https://www.myinstants.com/media/sounds/wrong.mp3');
+  <!-- Custom Dialog Box -->
+  <div id="dialogOverlay">
+    <div id="dialogBox">
+      <div id="dialogMessage"></div>
+      <button id="dialogClose" onclick="closeDialog()">OK</button>
+    </div>
+  </div>
 
+  <!-- Sound Effects -->
+  <audio id="correctSound" src="https://www.myinstants.com/media/sounds/correct-answer.mp3"></audio>
+  <audio id="wrongSound" src="https://www.myinstants.com/media/sounds/wrong-answer.mp3"></audio>
+  <audio id="winSound" src="https://www.myinstants.com/media/sounds/applause.mp3"></audio>
+  <audio id="loseSound" src="https://www.myinstants.com/media/sounds/sad-trombone.mp3"></audio>
+
+  <script>
     let score = 0;
     let num1, num2, operation, correctAnswer;
-    const face = document.getElementById('face');
     let selectedOperation = "×";
+    let goal = 10;
+    let countdownTime = 120; // Default 2 minutes in seconds
+    let countdownInterval = null;
+    let gameStarted = false;
+    const car = document.getElementById('car');
+    const track = document.getElementById('track');
+    const dialogOverlay = document.getElementById('dialogOverlay');
+    const dialogMessage = document.getElementById('dialogMessage');
+    const correctSound = document.getElementById('correctSound');
+    const wrongSound = document.getElementById('wrongSound');
+    const winSound = document.getElementById('winSound');
+    const loseSound = document.getElementById('loseSound');
 
+    // Set the goal
+    function setGoal() {
+      goal = parseInt(document.getElementById('goalInput').value);
+      if (goal < 5 || goal > 50 || isNaN(goal)) {
+        showDialog('Please set a goal between 5 and 50! ⚠️');
+        goal = 10;
+        document.getElementById('goalInput').value = 10;
+      }
+      resetGame();
+    }
+
+    // Set the countdown time
+    function setCountdown() {
+      const minutes = parseInt(document.getElementById('countdownInput').value);
+      if (minutes < 1 || minutes > 10 || isNaN(minutes)) {
+        showDialog('Please set a time between 1 and 10 minutes! ⚠️');
+        countdownTime = 120;
+        document.getElementById('countdownInput').value = 1;
+      } else {
+        countdownTime = minutes * 60;
+      }
+      updateCountdownDisplay();
+      resetGame();
+    }
+
+    // Update countdown display
+    function updateCountdownDisplay() {
+      const minutes = Math.floor(countdownTime / 60);
+      const seconds = countdownTime % 60;
+      document.getElementById('countdown').textContent = `Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    // Start the game and countdown
+    function startGame() {
+      if (gameStarted) return; // Prevent restarting if already started
+      gameStarted = true;
+      document.getElementById('startBtn').disabled = true; // Disable Start button
+      document.getElementById('startBtn').style.background = '#ccc'; // Gray out button
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        countdownTime--;
+        updateCountdownDisplay();
+        if (countdownTime <= 0) {
+          clearInterval(countdownInterval);
+          loseSound.play();
+          showDialog('Time’s Up! ⏰ Try Again!');
+          resetGame();
+        }
+      }, 1000);
+    }
+
+    // Update car position
+    function updateCar() {
+      const trackWidth = track.clientWidth - 50; // Adjust for car width
+      const position = (score / goal) * trackWidth; // Scale position based on goal
+      car.style.left = `${position}px`;
+      car.classList.add('wiggle'); // Add wiggle animation
+      if (score >= goal) {
+        clearInterval(countdownInterval);
+        winSound.play();
+        showDialog('You Win! 🏆 Great Job!');
+        resetGame();
+      }
+    }
+
+    // Operation selector
     const opButtons = document.querySelectorAll('.op-button');
     opButtons.forEach(button => {
       button.addEventListener('click', () => {
@@ -302,47 +530,70 @@
 
     let inputValue = "";
     function appendNumber(num) {
+      if (!gameStarted) {
+        showDialog('Press Start to Play! 🚗');
+        return;
+      }
       inputValue += num;
       document.getElementById("display").value = inputValue;
     }
     function clearDisplay() {
+      if (!gameStarted) {
+        showDialog('Press Start to Play! 🚗');
+        return;
+      }
       inputValue = "";
       document.getElementById("display").value = "";
     }
     function checkAnswer() {
+      if (!gameStarted) {
+        showDialog('Press Start to Play! 🚗');
+        return;
+      }
       const userAnswer = parseInt(inputValue);
       if (userAnswer === correctAnswer) {
         score++;
-        document.getElementById("score").textContent = `Score: ${score}`;
-        face.classList.remove('sad');
-        face.classList.add('happy');
         correctSound.play();
-        generateQuestion();
-        clearDisplay();
+        showDialog('Great Job! 🎉');
       } else {
         score--;
-        document.getElementById("score").textContent = `Score: ${score}`;
-        face.classList.remove('happy');
-        face.classList.add('sad');
+        if (score < 0) score = 0;
         wrongSound.play();
-        clearDisplay();
-        face.style.animation = 'shake 0.5s';
-        setTimeout(() => face.style.animation = '', 500);
+        showDialog('Oops! Try Again! 😢');
       }
+      document.getElementById("score").textContent = `Score: ${score}`;
+      updateCar();
+      generateQuestion();
+      clearDisplay();
     }
 
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = `
-      @keyframes shake {
-        0% { transform: translateX(0); }
-        20% { transform: translateX(-8px) rotate(-3deg); }
-        40% { transform: translateX(8px) rotate(3deg); }
-        60% { transform: translateX(-8px) rotate(-3deg); }
-        80% { transform: translateX(8px) rotate(3deg); }
-        100% { transform: translateX(0); }
-      }
-    `;
-    document.head.appendChild(styleSheet);
+    function resetGame() {
+      score = 0;
+      countdownTime = parseInt(document.getElementById('countdownInput').value) * 60 || 120;
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = null;
+      gameStarted = false;
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('startBtn').style.background = '#4caf50'; // Reset button color
+      document.getElementById("score").textContent = `Score: ${score}`;
+      updateCountdownDisplay();
+      updateCar();
+      generateQuestion();
+      clearDisplay();
+    }
+
+    // Custom Dialog Functions
+    function showDialog(message) {
+      dialogMessage.textContent = message;
+      dialogOverlay.style.display = 'flex';
+    }
+    function closeDialog() {
+      dialogOverlay.style.display = 'none';
+    }
+
+    // Initialize
+    updateCar();
+    updateCountdownDisplay();
   </script>
 </body>
 </html>
