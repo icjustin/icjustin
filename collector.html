@@ -8,6 +8,7 @@
       overflow: hidden;
       background: linear-gradient(180deg, #1a0033, #000033);
       font-family: 'Arial', sans-serif;
+      touch-action: none; /* Prevents default touch behaviors like scrolling */
     }
     #gameContainer {
       width: 100vw;
@@ -18,91 +19,97 @@
       top: 0;
       left: 0;
       width: 100%;
-      padding: 20px;
+      padding: 10px;
       color: #fff;
       text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
       z-index: 10;
+      box-sizing: border-box;
     }
     #score, #timerDisplay {
-      font-size: 32px;
+      font-size: 24px;
       font-weight: bold;
       background: rgba(0, 0, 0, 0.5);
-      padding: 10px 20px;
-      border-radius: 10px;
+      padding: 5px 10px;
+      border-radius: 8px;
       display: inline-block;
-      margin-right: 10px;
+      margin-right: 5px;
     }
-    /* Start menu styling */
     #menu {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(0, 0, 0, 0.8);
-      padding: 30px;
-      border-radius: 15px;
+      padding: 20px;
+      border-radius: 10px;
       color: #fff;
       text-align: center;
       z-index: 20;
+      width: 80%;
+      max-width: 400px;
+      box-sizing: border-box;
     }
     #menu h1 {
-      font-size: 48px;
-      margin-bottom: 20px;
+      font-size: 36px;
+      margin-bottom: 15px;
     }
     #menu label {
-      font-size: 24px;
+      font-size: 18px;
     }
     #menu select, #menu input {
-      font-size: 24px;
+      font-size: 18px;
       padding: 5px;
-      margin: 10px;
+      margin: 8px;
+      width: 80%;
     }
     #menu button {
-      font-size: 24px;
-      padding: 10px 20px;
-      margin-top: 20px;
+      font-size: 18px;
+      padding: 8px 16px;
+      margin-top: 15px;
       cursor: pointer;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       background: #00aaff;
       color: #fff;
+      width: 80%;
     }
-    /* Game Over screen styling */
     #gameOver {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(0, 0, 0, 0.8);
-      padding: 30px;
-      border-radius: 15px;
+      padding: 20px;
+      border-radius: 10px;
       color: #fff;
       text-align: center;
       z-index: 30;
       display: none;
+      width: 80%;
+      max-width: 400px;
+      box-sizing: border-box;
     }
     #gameOver h1 {
-      font-size: 48px;
-      margin-bottom: 20px;
+      font-size: 36px;
+      margin-bottom: 15px;
     }
     #gameOver button {
-      font-size: 24px;
-      padding: 10px 20px;
+      font-size: 18px;
+      padding: 8px 16px;
       cursor: pointer;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       background: #00aaff;
       color: #fff;
+      width: 80%;
     }
   </style>
 </head>
 <body>
-  <!-- UI Elements -->
   <div id="ui">
     <div id="score">Score: 0</div>
     <div id="timerDisplay">Time: 60</div>
   </div>
-  <!-- Menu for game start and timer selection -->
   <div id="menu">
     <h1>Cosmic Collector</h1>
     <label for="duration">Select Duration:</label>
@@ -114,7 +121,6 @@
     <br>
     <button id="startButton">Start Game</button>
   </div>
-  <!-- Game Over screen -->
   <div id="gameOver">
     <h1>Game Over!</h1>
     <p id="finalScore"></p>
@@ -122,7 +128,6 @@
   </div>
   <div id="gameContainer"></div>
 
-  <!-- Three.js library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script>
     /* --- Audio Generation --- */
@@ -139,26 +144,26 @@
       oscillator.stop(audioContext.currentTime + duration);
     }
 
-    // Background music with a revving engine feel.
+    // Smoother, happier background music
     let bgOscillator, bgGain;
     function startBackgroundMusic() {
       bgOscillator = audioContext.createOscillator();
       bgGain = audioContext.createGain();
       bgOscillator.connect(bgGain);
       bgGain.connect(audioContext.destination);
-      bgOscillator.type = 'sawtooth'; // Motorcycle engine-like sound.
-      bgOscillator.frequency.value = 220;
-      bgGain.gain.value = 0.2;
+      bgOscillator.type = 'triangle'; // Smoother, more cheerful than sawtooth
+      bgOscillator.frequency.value = 440; // Higher base frequency for a brighter tone
+      bgGain.gain.value = 0.15; // Lower volume for a less intense feel
       bgOscillator.start();
     }
     function stopBackgroundMusic() {
-      if(bgOscillator) {
+      if (bgOscillator) {
         bgOscillator.stop();
         bgOscillator = null;
       }
     }
 
-    /* --- Game Over Sound (Mario Classic Style) --- */
+    /* --- Game Over Sound --- */
     function playGameOverSound() {
       const now = audioContext.currentTime;
       const toneSequence = [
@@ -189,7 +194,6 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById('gameContainer').appendChild(renderer.domElement);
 
-    // Lighting
     const ambientLight = new THREE.AmbientLight(0x404040);
     scene.add(ambientLight);
     const pointLight = new THREE.PointLight(0xffffff, 1, 100);
@@ -263,29 +267,58 @@
 
     camera.position.z = 8;
 
-    /* --- Player Controls --- */
-    let moveLeft = false;
-    let moveRight = false;
-    document.addEventListener('keydown', (event) => {
-      if (!gameRunning) return;
-      if (event.key === 'ArrowLeft') moveLeft = true;
-      if (event.key === 'ArrowRight') moveRight = true;
-    });
-    document.addEventListener('keyup', (event) => {
-      if (event.key === 'ArrowLeft') moveLeft = false;
-      if (event.key === 'ArrowRight') moveRight = false;
-    });
+    /* --- Touch and Mouse Controls --- */
+    let isDragging = false;
+    let previousX = 0;
+    let targetX = player.position.x;
 
-    /* --- Enhanced Particle Effects --- */
+    const canvas = renderer.domElement; // Reference the canvas directly
+    canvas.addEventListener('mousedown', startDragging);
+    canvas.addEventListener('touchstart', startDragging, { passive: false });
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('touchmove', drag, { passive: false });
+    document.addEventListener('mouseup', stopDragging);
+    document.addEventListener('touchend', stopDragging);
+
+    function startDragging(event) {
+      if (!gameRunning) return;
+      event.preventDefault();
+      isDragging = true;
+      previousX = getClientX(event);
+    }
+
+    function drag(event) {
+      if (!isDragging || !gameRunning) return;
+      event.preventDefault();
+      const currentX = getClientX(event);
+      const deltaX = currentX - previousX;
+      previousX = currentX;
+
+      const sensitivity = 0.015; // Slightly increased for better responsiveness
+      const distance = Math.abs(camera.position.z - player.position.z);
+      const halfWidth = distance * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect;
+      const margin = 0.5;
+
+      targetX += deltaX * sensitivity;
+      targetX = Math.max(-halfWidth + margin, Math.min(halfWidth - margin, targetX));
+    }
+
+    function stopDragging() {
+      isDragging = false;
+    }
+
+    function getClientX(event) {
+      return event.type.includes('touch') ? event.touches[0].clientX : event.clientX;
+    }
+
+    /* --- Particle Effects --- */
     function createParticleEffect(position, color) {
       const particles = new THREE.Group();
       const particleGeo = new THREE.SphereGeometry(0.05, 8, 8);
       const particleMat = new THREE.MeshBasicMaterial({ color: color });
-      // Create 50 particles for a denser effect.
       for (let i = 0; i < 50; i++) {
         const particle = new THREE.Mesh(particleGeo, particleMat.clone());
         particle.position.copy(position);
-        // Assign a random velocity vector.
         particle.userData.velocity = new THREE.Vector3(
           (Math.random() - 0.5) * 0.2,
           (Math.random() - 0.5) * 0.2,
@@ -295,7 +328,7 @@
       }
       scene.add(particles);
       const startTime = performance.now();
-      const lifetime = 1500; // milliseconds.
+      const lifetime = 1500;
       function animateParticles() {
         const elapsed = performance.now() - startTime;
         if (elapsed < lifetime) {
@@ -315,7 +348,7 @@
       animateParticles();
     }
 
-    /* --- Collectible (Diamond) --- */
+    /* --- Collectible --- */
     function createCollectible() {
       const geometry = new THREE.DodecahedronGeometry(0.5);
       const material = new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff, specular: 0xffffff, shininess: 50 });
@@ -331,7 +364,7 @@
       const enemyType = Math.floor(Math.random() * 3);
       let enemy;
       switch(enemyType) {
-        case 0: // Monster Alien
+        case 0:
           enemy = new THREE.Group();
           const bodyGeo = new THREE.SphereGeometry(0.6, 32, 32);
           const bodyMat = new THREE.MeshPhongMaterial({ color: 0x00aa00, specular: 0x006600, shininess: 30 });
@@ -377,7 +410,7 @@
               enemy.add(mouth);
           }
           break;
-        case 1: // Flying Saucer
+        case 1:
           enemy = new THREE.Group();
           const saucerGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.2, 32);
           const saucerMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, specular: 0x880000, shininess: 20 });
@@ -389,7 +422,7 @@
           dome.position.y = 0.1;
           enemy.add(dome);
           break;
-        case 2: // Tentacle Enemy
+        case 2:
           enemy = new THREE.Group();
           const cubeGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
           const cubeMaterial = new THREE.MeshPhongMaterial({ color: 0x9900ff, specular: 0x550077, shininess: 40 });
@@ -449,6 +482,7 @@
       scoreDisplay.textContent = `Score: ${score}`;
       timeRemaining = gameDuration;
       player.position.x = 0;
+      targetX = 0;
       if(timerInterval) {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -464,27 +498,15 @@
       time += 0.05;
       gameSpeed = baseSpeed + score * 0.0005;
       if(bgOscillator) {
-        bgOscillator.frequency.value = 220 + score * 0.5;
-        bgGain.gain.value = Math.min(0.5, 0.2 + score * 0.001);
+        // Smoother frequency increase for happier feel
+        bgOscillator.frequency.value = 440 + Math.sin(time * 0.5) * 50 + score * 0.2;
+        bgGain.gain.value = Math.min(0.3, 0.15 + score * 0.0005);
       }
-      
-      // Calculate boundaries based on camera view.
-      const distance = Math.abs(camera.position.z - player.position.z);
-      const halfHeight = distance * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-      const halfWidth = halfHeight * camera.aspect;
-      const margin = 0.5;
-      
-      // --- Simple Player Movement ---
-      if (moveLeft && player.position.x > -halfWidth + margin) {
-        player.position.x -= 0.1;
-      }
-      if (moveRight && player.position.x < halfWidth - margin) {
-        player.position.x += 0.1;
-      }
-      
+
+      // Smooth player movement
+      player.position.x += (targetX - player.position.x) * 0.1;
       player.rotation.z = Math.sin(time) * 0.2;
 
-      // Update collectibles.
       collectibles.forEach((collectible, index) => {
         collectible.position.y -= gameSpeed;
         collectible.rotation.x += 0.1;
@@ -505,8 +527,7 @@
           collectibles.splice(index, 1);
         }
       });
-      
-      // Update enemies.
+
       enemies.forEach((enemy, index) => {
         enemy.position.y -= gameSpeed;
         enemy.rotation.x += 0.05;
@@ -522,7 +543,7 @@
           enemies.splice(index, 1);
         }
       });
-      
+
       if (Math.random() < 0.03) createCollectible();
       if (Math.random() < 0.01) createEnemy();
       stars.rotation.y += 0.001;
@@ -553,12 +574,6 @@
       gameOverScreen.style.display = 'none';
     });
 
-    /* Further enhancement suggestions:
-       - Add power-ups (e.g., shields, multipliers, extra time).
-       - Implement level progression with new enemy types and backgrounds.
-       - Add achievements or high score tracking.
-       - Further adjust particle animations for different explosion types.
-    */
   </script>
 </body>
 </html>
