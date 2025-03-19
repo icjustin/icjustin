@@ -13,33 +13,36 @@
     html, body {
       height: 100%;
       overflow: hidden;
-      font-family: 'Baloo 2', 'Arial', sans-serif;
-      background: linear-gradient(135deg, #1e1e2f, #2a2a40);
-      color: #e0e0e0;
+      font-family: 'Comic Neue', 'Arial', sans-serif;
+      background: linear-gradient(135deg, #ffeb3b, #ffca28);
+      color: #333;
+      touch-action: manipulation; /* Prevents double-tap zooming */
     }
     #gameContainer {
       height: 100%;
       width: 100%;
-      max-width: 450px;
+      max-width: 100%;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 15px;
+      padding: 10px;
+      background: url('https://www.transparenttextures.com/patterns/circles.png'), rgba(255, 255, 255, 0.8);
     }
     #face {
       width: 100px;
       height: 100px;
-      background: #3498db;
+      background: #4caf50;
       border-radius: 50%;
       position: relative;
-      box-shadow: 0 0 15px rgba(52, 152, 219, 0.6);
-      transition: background 0.3s ease;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s ease;
       flex-shrink: 0;
+      margin-top: 10px;
     }
-    #face.happy { background: #2ecc71; }
-    #face.sad { background: #e74c3c; }
+    #face.happy { background: #4caf50; }
+    #face.sad { background: #f44336; }
     .eye {
       width: 18px;
       height: 18px;
@@ -47,69 +50,110 @@
       border-radius: 50%;
       position: absolute;
       top: 25px;
+      box-shadow: inset 0 0 3px rgba(0,0,0,0.3);
     }
     .eye.left { left: 25px; }
     .eye.right { right: 25px; }
     #mouth {
       position: absolute;
-      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       width: 50px;
       height: 25px;
       background: #fff;
+      transition: all 0.4s ease;
+    }
+    #face.happy #mouth {
+      bottom: 15px;
       border-radius: 0 0 25px 25px;
-      transition: all 0.3s ease;
     }
     #face.sad #mouth {
+      bottom: 15px;
       border-radius: 25px 25px 0 0;
-      bottom: 40px;
+      transform: translateX(-50%) rotate(180deg);
     }
     #ui {
-      background: rgba(30, 30, 47, 0.9);
-      padding: 15px;
-      border-radius: 12px;
-      border: 3px solid #3498db;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      border-radius: 15px;
+      border: 3px solid #2196f3;
       text-align: center;
       width: 100%;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
       flex-shrink: 0;
+      margin: 10px 0;
     }
     #question {
-      font-size: 3.5rem;
+      font-size: 2.5rem;
       font-weight: 700;
-      color: #f1c40f;
-      margin-bottom: 8px;
-      word-wrap: break-word;
+      color: #e91e63;
+      margin-bottom: 5px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
     }
     #score {
-      font-size: 1.8rem;
-      color: #ecf0f1;
+      font-size: 1.5rem;
+      color: #2196f3;
+      font-weight: 700;
+    }
+    #operationSelector {
+      margin-top: 5px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .op-button {
+      width: 50px;
+      height: 50px;
+      font-size: 1.5rem;
+      background: #ff9800;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px #e65100;
+    }
+    .op-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 8px rgba(255, 152, 0, 0.7);
+    }
+    .op-button:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px #e65100;
+    }
+    .op-button.active {
+      background: #d81b60;
+      box-shadow: 0 3px #ad1457;
     }
     #calculator {
       width: 100%;
-      background: rgba(42, 42, 64, 0.95);
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 10px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
       flex-grow: 1;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      border: 2px solid #2196f3;
     }
     #display {
       width: 100%;
-      height: 70px;
-      font-size: 3rem;
+      height: 60px;
+      font-size: 2.5rem;
       text-align: right;
       padding: 10px;
-      border: 3px solid #3498db;
+      border: 3px solid #2196f3;
       border-radius: 10px;
-      background: #34495e;
-      color: #fff;
-      margin-bottom: 15px;
+      background: #e3f2fd;
+      color: #333;
+      margin-bottom: 10px;
       outline: none;
       font-weight: 700;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
     }
     .button-grid {
       display: grid;
@@ -120,49 +164,52 @@
     .calc-button {
       padding: 0;
       font-size: 2rem;
-      background: linear-gradient(135deg, #3498db, #2980b9);
+      background: #2196f3;
       border: none;
       border-radius: 10px;
       color: #fff;
       cursor: pointer;
-      box-shadow: 0 4px #1f618d;
+      box-shadow: 0 4px #1565c0;
       transition: all 0.2s ease;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
+      min-height: 60px; /* Larger touch target */
     }
     .calc-button:hover {
-      background: linear-gradient(135deg, #2980b9, #3498db);
+      background: #42a5f5;
       transform: scale(1.05);
     }
     .calc-button:active {
-      box-shadow: 0 2px #1f618d;
+      box-shadow: 0 2px #1565c0;
       transform: translateY(2px);
     }
     #clear {
-      background: linear-gradient(135deg, #e67e22, #d35400);
-      grid-column: 3 / 4;
+      background: #ff5722;
+      box-shadow: 0 4px #d84315;
     }
-    #clear:hover { background: linear-gradient(135deg, #d35400, #e67e22); }
+    #clear:hover { background: #ff8a65; }
+    #clear:active { box-shadow: 0 2px #d84315; }
     #submit {
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      grid-column: 4 / 5;
+      background: #4caf50;
+      box-shadow: 0 4px #388e3c;
     }
-    #submit:hover { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+    #submit:hover { background: #81c784; }
+    #submit:active { box-shadow: 0 2px #388e3c; }
 
     @media (max-width: 400px) {
-      #gameContainer { padding: 10px; }
+      #gameContainer { padding: 5px; }
       #face { width: 80px; height: 80px; }
       .eye { width: 14px; height: 14px; top: 20px; }
       .eye.left { left: 20px; }
       .eye.right { right: 20px; }
-      #mouth { width: 40px; height: 20px; bottom: 15px; }
-      #face.sad #mouth { bottom: 35px; }
-      #question { font-size: 2.5rem; }
-      #score { font-size: 1.5rem; }
-      #display { font-size: 2rem; height: 60px; }
-      .calc-button { font-size: 1.8rem; }
+      #mouth { width: 40px; height: 20px; bottom: 10px; }
+      #question { font-size: 2rem; }
+      #score { font-size: 1.2rem; }
+      #display { font-size: 2rem; height: 50px; }
+      .calc-button { font-size: 1.8rem; min-height: 50px; }
+      .op-button { width: 40px; height: 40px; font-size: 1.2rem; }
     }
     @media (max-height: 600px) {
       #gameContainer { padding: 5px; }
@@ -170,15 +217,15 @@
       .eye { width: 12px; height: 12px; top: 18px; }
       .eye.left { left: 18px; }
       .eye.right { right: 18px; }
-      #mouth { width: 35px; height: 18px; bottom: 12px; }
-      #face.sad #mouth { bottom: 30px; }
-      #question { font-size: 2rem; }
-      #score { font-size: 1.3rem; }
-      #display { font-size: 1.8rem; height: 50px; }
-      .calc-button { font-size: 1.6rem; }
+      #mouth { width: 35px; height: 18px; bottom: 8px; }
+      #question { font-size: 1.8rem; }
+      #score { font-size: 1rem; }
+      #display { font-size: 1.8rem; height: 40px; }
+      .calc-button { font-size: 1.6rem; min-height: 45px; }
+      .op-button { width: 35px; height: 35px; font-size: 1rem; }
     }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="gameContainer">
@@ -190,6 +237,11 @@
     <div id="ui">
       <div id="question">3 × 4 = ?</div>
       <div id="score">Score: 0</div>
+      <div id="operationSelector">
+        <button class="op-button" data-op="+">+</button>
+        <button class="op-button" data-op="-">-</button>
+        <button class="op-button" data-op="×">×</button>
+      </div>
     </div>
     <div id="calculator">
       <input type="text" id="display" readonly>
@@ -205,29 +257,45 @@
         <button class="calc-button" onclick="appendNumber('9')">9</button>
         <button class="calc-button" onclick="appendNumber('0')">0</button>
         <button id="clear" class="calc-button" onclick="clearDisplay()">C</button>
-        <button id="submit" class="calc-button" onclick="checkAnswer()">Submit</button>
+        <button id="submit" class="calc-button" onclick="checkAnswer()">✔</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Sound Feedback
     const correctSound = new Audio('https://www.myinstants.com/media/sounds/correct.mp3');
     const wrongSound = new Audio('https://www.myinstants.com/media/sounds/wrong.mp3');
 
-    // Game Logic
     let score = 0;
     let num1, num2, operation, correctAnswer;
     const face = document.getElementById('face');
+    let selectedOperation = "×";
+
+    const opButtons = document.querySelectorAll('.op-button');
+    opButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        opButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        selectedOperation = button.dataset.op;
+        generateQuestion();
+        clearDisplay();
+      });
+    });
+    opButtons[2].classList.add('active');
 
     function generateQuestion() {
       num1 = Math.floor(Math.random() * 9) + 1;
       num2 = Math.floor(Math.random() * 9) + 1;
-      const ops = ["+", "-", "×"];
-      operation = ops[Math.floor(Math.random() * ops.length)];
-      if (operation === "+") correctAnswer = num1 + num2;
-      else if (operation === "-") correctAnswer = num1 - num2;
-      else correctAnswer = num1 * num2;
+      operation = selectedOperation;
+
+      if (operation === "+") {
+        correctAnswer = num1 + num2;
+      } else if (operation === "-") {
+        if (num1 < num2) [num1, num2] = [num2, num1];
+        correctAnswer = num1 - num2;
+      } else {
+        correctAnswer = num1 * num2;
+      }
       document.getElementById("question").textContent = `${num1} ${operation} ${num2} = ?`;
     }
     generateQuestion();
@@ -263,14 +331,14 @@
       }
     }
 
-    // Shake Animation
     const styleSheet = document.createElement('style');
     styleSheet.textContent = `
       @keyframes shake {
         0% { transform: translateX(0); }
-        25% { transform: translateX(-8px); }
-        50% { transform: translateX(8px); }
-        75% { transform: translateX(-8px); }
+        20% { transform: translateX(-8px) rotate(-3deg); }
+        40% { transform: translateX(8px) rotate(3deg); }
+        60% { transform: translateX(-8px) rotate(-3deg); }
+        80% { transform: translateX(8px) rotate(3deg); }
         100% { transform: translateX(0); }
       }
     `;
