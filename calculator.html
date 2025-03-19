@@ -1,312 +1,233 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Kids' Math Adventure – Super Educational Edition</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kids' Calculator Game – Happy/Sad Edition</title>
   <style>
-    body {
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
       overflow: hidden;
-      background: linear-gradient(135deg, #ffd1dc, #c1ff72, #87ceeb);
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Baloo 2', 'Arial', sans-serif;
+      background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+      color: #e0e0e0;
     }
     #gameContainer {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-    #ui {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      color: #fff;
-      font-size: 36px;
-      text-shadow: 0 0 8px #ff4081, 0 0 15px #ff4081;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 20px;
-      border-radius: 20px;
-      border: 4px solid #ffeb3b;
-    }
-    #question {
-      font-size: 64px;
-      margin-bottom: 10px;
-    }
-    #feedback {
-      font-size: 32px;
-      color: #ffeb3b;
-      margin-top: 10px;
-    }
-    #score, #stars {
-      font-size: 36px;
-    }
-    #modeSelector {
-      position: absolute;
-      top: 20px;
-      right: 20px;
+      height: 100%;
+      width: 100%;
+      max-width: 450px;
+      margin: 0 auto;
       display: flex;
-      gap: 15px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
     }
-    .mode-button {
+    #face {
       width: 100px;
       height: 100px;
-      font-size: 24px;
-      background: linear-gradient(135deg, #ffeb3b, #ff9800);
-      border: none;
-      border-radius: 15px;
-      cursor: pointer;
-      box-shadow: 0 8px #ff5722;
-      transition: all 0.2s;
+      background: #3498db;
+      border-radius: 50%;
+      position: relative;
+      box-shadow: 0 0 15px rgba(52, 152, 219, 0.6);
+      transition: background 0.3s ease;
+      flex-shrink: 0;
     }
-    .mode-button:hover {
-      transform: scale(1.1);
-    }
-    .mode-button:active {
-      box-shadow: 0 4px #ff5722;
-      transform: translateY(4px);
-    }
-    .mode-button.selected {
-      background: linear-gradient(135deg, #4caf50, #8bc34a);
-      box-shadow: 0 8px #388e3c;
-    }
-    #calculator {
+    #face.happy { background: #2ecc71; }
+    #face.sad { background: #e74c3c; }
+    .eye {
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
       position: absolute;
-      bottom: 40px;
+      top: 25px;
+    }
+    .eye.left { left: 25px; }
+    .eye.right { right: 25px; }
+    #mouth {
+      position: absolute;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.95);
-      padding: 30px;
-      border-radius: 25px;
-      box-shadow: 0 0 40px rgba(255, 235, 59, 1);
+      width: 50px;
+      height: 25px;
+      background: #fff;
+      border-radius: 0 0 25px 25px;
+      transition: all 0.3s ease;
+    }
+    #face.sad #mouth {
+      border-radius: 25px 25px 0 0;
+      bottom: 40px;
+    }
+    #ui {
+      background: rgba(30, 30, 47, 0.9);
+      padding: 15px;
+      border-radius: 12px;
+      border: 3px solid #3498db;
+      text-align: center;
+      width: 100%;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+      flex-shrink: 0;
+    }
+    #question {
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: #f1c40f;
+      margin-bottom: 8px;
+      word-wrap: break-word;
+    }
+    #score {
+      font-size: 1.8rem;
+      color: #ecf0f1;
+    }
+    #calculator {
+      width: 100%;
+      background: rgba(42, 42, 64, 0.95);
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     #display {
-      width: 350px;
-      height: 90px;
-      font-size: 48px;
+      width: 100%;
+      height: 70px;
+      font-size: 3rem;
       text-align: right;
-      padding: 15px;
-      margin-bottom: 20px;
-      border: 4px solid #ff4081;
+      padding: 10px;
+      border: 3px solid #3498db;
       border-radius: 10px;
-      background: #fff;
-      box-shadow: inset 0 0 10px #000;
-    }
-    .button-row {
-      display: flex;
-      gap: 15px;
+      background: #34495e;
+      color: #fff;
       margin-bottom: 15px;
+      outline: none;
+      font-weight: 700;
+    }
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      flex-grow: 1;
     }
     .calc-button {
-      width: 90px;
-      height: 90px;
-      font-size: 40px;
-      font-family: 'Comic Sans MS', cursive;
-      background: linear-gradient(135deg, #ffeb3b, #ff4081);
+      padding: 0;
+      font-size: 2rem;
+      background: linear-gradient(135deg, #3498db, #2980b9);
       border: none;
-      border-radius: 20px;
+      border-radius: 10px;
+      color: #fff;
       cursor: pointer;
-      box-shadow: 0 10px #e91e63;
-      transition: all 0.2s;
+      box-shadow: 0 4px #1f618d;
+      transition: all 0.2s ease;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .calc-button:hover {
-      background: linear-gradient(135deg, #ff4081, #ffeb3b);
+      background: linear-gradient(135deg, #2980b9, #3498db);
       transform: scale(1.05);
     }
     .calc-button:active {
-      box-shadow: 0 5px #e91e63;
-      transform: translateY(5px);
+      box-shadow: 0 2px #1f618d;
+      transform: translateY(2px);
     }
-    #submit, #hint {
-      background: linear-gradient(135deg, #4caf50, #8bc34a);
-      width: 150px;
-      font-size: 36px;
+    #clear {
+      background: linear-gradient(135deg, #e67e22, #d35400);
+      grid-column: 3 / 4;
     }
-    #submit:hover, #hint:hover {
-      background: linear-gradient(135deg, #8bc34a, #4caf50);
+    #clear:hover { background: linear-gradient(135deg, #d35400, #e67e22); }
+    #submit {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      grid-column: 4 / 5;
+    }
+    #submit:hover { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+
+    @media (max-width: 400px) {
+      #gameContainer { padding: 10px; }
+      #face { width: 80px; height: 80px; }
+      .eye { width: 14px; height: 14px; top: 20px; }
+      .eye.left { left: 20px; }
+      .eye.right { right: 20px; }
+      #mouth { width: 40px; height: 20px; bottom: 15px; }
+      #face.sad #mouth { bottom: 35px; }
+      #question { font-size: 2.5rem; }
+      #score { font-size: 1.5rem; }
+      #display { font-size: 2rem; height: 60px; }
+      .calc-button { font-size: 1.8rem; }
+    }
+    @media (max-height: 600px) {
+      #gameContainer { padding: 5px; }
+      #face { width: 70px; height: 70px; }
+      .eye { width: 12px; height: 12px; top: 18px; }
+      .eye.left { left: 18px; }
+      .eye.right { right: 18px; }
+      #mouth { width: 35px; height: 18px; bottom: 12px; }
+      #face.sad #mouth { bottom: 30px; }
+      #question { font-size: 2rem; }
+      #score { font-size: 1.3rem; }
+      #display { font-size: 1.8rem; height: 50px; }
+      .calc-button { font-size: 1.6rem; }
     }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="gameContainer">
+    <div id="face">
+      <div class="eye left"></div>
+      <div class="eye right"></div>
+      <div id="mouth"></div>
+    </div>
     <div id="ui">
       <div id="question">3 × 4 = ?</div>
       <div id="score">Score: 0</div>
-      <div id="stars">Stars: ★ 0</div>
-      <div id="feedback"></div>
-    </div>
-    <div id="modeSelector">
-      <button class="mode-button" onclick="setMode('add')">+</button>
-      <button class="mode-button" onclick="setMode('sub')">−</button>
-      <button class="mode-button" onclick="setMode('mul')">×</button>
     </div>
     <div id="calculator">
       <input type="text" id="display" readonly>
-      <div class="button-row">
+      <div class="button-grid">
         <button class="calc-button" onclick="appendNumber('1')">1</button>
         <button class="calc-button" onclick="appendNumber('2')">2</button>
         <button class="calc-button" onclick="appendNumber('3')">3</button>
-      </div>
-      <div class="button-row">
         <button class="calc-button" onclick="appendNumber('4')">4</button>
         <button class="calc-button" onclick="appendNumber('5')">5</button>
         <button class="calc-button" onclick="appendNumber('6')">6</button>
-      </div>
-      <div class="button-row">
         <button class="calc-button" onclick="appendNumber('7')">7</button>
         <button class="calc-button" onclick="appendNumber('8')">8</button>
         <button class="calc-button" onclick="appendNumber('9')">9</button>
-      </div>
-      <div class="button-row">
         <button class="calc-button" onclick="appendNumber('0')">0</button>
-        <button class="calc-button" onclick="clearDisplay()">C</button>
-        <button id="hint" class="calc-button" onclick="showHint()">Hint</button>
+        <button id="clear" class="calc-button" onclick="clearDisplay()">C</button>
         <button id="submit" class="calc-button" onclick="checkAnswer()">Submit</button>
       </div>
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script>
-    // Three.js Setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById("gameContainer").appendChild(renderer.domElement);
-
-    // Background
-    const sphereGeometry = new THREE.SphereGeometry(500, 32, 32);
-    const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0x1a2a1a, side: THREE.BackSide });
-    const backgroundSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    scene.add(backgroundSphere);
-
-    // Happy/Sad Face (Star)
-    const faceGroup = new THREE.Group();
-    const starGeometry = new THREE.SphereGeometry(60, 32, 32);
-    const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffeb3b });
-    const star = new THREE.Mesh(starGeometry, starMaterial);
-    faceGroup.add(star);
-
-    const eyeGeometry = new THREE.SphereGeometry(10, 16, 16);
-    const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-    const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-    leftEye.position.set(-20, 15, 50);
-    const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-    rightEye.position.set(20, 15, 50);
-    faceGroup.add(leftEye, rightEye);
-
-    let mouth;
-    function updateMouth(isHappy) {
-      if (mouth) faceGroup.remove(mouth);
-      const mouthGeometry = new THREE.ShapeGeometry(
-        isHappy ? drawSmile() : drawFrown()
-      );
-      const mouthMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-      mouth = new THREE.Mesh(mouthGeometry, mouthMaterial);
-      mouth.position.set(0, -15, 50);
-      faceGroup.add(mouth);
-    }
-    function drawSmile() {
-      const shape = new THREE.Shape();
-      shape.moveTo(-20, 0);
-      shape.quadraticCurveTo(0, -20, 20, 0);
-      return shape;
-    }
-    function drawFrown() {
-      const shape = new THREE.Shape();
-      shape.moveTo(-20, 0);
-      shape.quadraticCurveTo(0, 20, 20, 0);
-      return shape;
-    }
-    updateMouth(true);
-
-    faceGroup.position.set(
-      window.innerWidth / 4 - 60,
-      60,
-      -window.innerHeight / 4 + 60
-    );
-    scene.add(faceGroup);
-
-    // Hint Stars
-    let hintStars = [];
-    function showHint() {
-      hintStars.forEach(s => scene.remove(s));
-      hintStars = [];
-      const count = operation === "×" ? num1 * num2 : operation === "+" ? num1 + num2 : num1;
-      for (let i = 0; i < count; i++) {
-        const geometry = new THREE.SphereGeometry(5, 16, 16);
-        const material = new THREE.MeshBasicMaterial({ color: 0xff4081 });
-        const star = new THREE.Mesh(geometry, material);
-        star.position.set(
-          -100 + (i % 5) * 40,
-          100 - Math.floor(i / 5) * 40,
-          0
-        );
-        hintStars.push(star);
-        scene.add(star);
-      }
-      setTimeout(() => {
-        hintStars.forEach(s => scene.remove(s));
-        hintStars = [];
-      }, 3000);
-    }
-
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-    scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    directionalLight.position.set(0, 50, 50);
-    scene.add(directionalLight);
-
-    // Camera
-    camera.position.set(0, 150, 300);
-    camera.lookAt(0, 0, 0);
-
-    // Particle System
-    let particles = [];
-    function createParticles(x, y, z, color) {
-      const particleCount = 40;
-      for (let i = 0; i < particleCount; i++) {
-        const geometry = new THREE.SphereGeometry(Math.random() * 3 + 2);
-        const material = new THREE.MeshBasicMaterial({ color });
-        const particle = new THREE.Mesh(geometry, material);
-        particle.position.set(x, y, z);
-        particles.push({
-          mesh: particle,
-          vx: (Math.random() - 0.5) * 6,
-          vy: Math.random() * 6,
-          vz: (Math.random() - 0.5) * 6,
-          alpha: 1
-        });
-        scene.add(particle);
-      }
-    }
-    function updateParticles() {
-      particles = particles.filter(p => {
-        p.mesh.position.x += p.vx;
-        p.mesh.position.y += p.vy;
-        p.mesh.position.z += p.vz;
-        p.vy -= 0.15;
-        p.alpha -= 0.015;
-        p.mesh.material.opacity = p.alpha;
-        if (p.alpha <= 0) scene.remove(p.mesh);
-        return p.alpha > 0;
-      });
-    }
+    // Sound Feedback
+    const correctSound = new Audio('https://www.myinstants.com/media/sounds/correct.mp3');
+    const wrongSound = new Audio('https://www.myinstants.com/media/sounds/wrong.mp3');
 
     // Game Logic
     let score = 0;
-    let starsEarned = 0;
     let num1, num2, operation, correctAnswer;
-    let mode = "add"; // Default mode
+    const face = document.getElementById('face');
+
     function generateQuestion() {
-      num1 = Math.floor(Math.random() * (score < 10 ? 5 : 9)) + 1; // 1-5 initially, then 1-9
-      num2 = Math.floor(Math.random() * (score < 10 ? 5 : 9)) + 1;
-      operation = mode === "add" ? "+" : mode === "sub" ? "-" : "×";
+      num1 = Math.floor(Math.random() * 9) + 1;
+      num2 = Math.floor(Math.random() * 9) + 1;
+      const ops = ["+", "-", "×"];
+      operation = ops[Math.floor(Math.random() * ops.length)];
       if (operation === "+") correctAnswer = num1 + num2;
-      else if (operation === "-") {
-        num1 = Math.max(num1, num2); // Ensure non-negative
-        num2 = Math.min(num1, num2);
-        correctAnswer = num1 - num2;
-      } else correctAnswer = num1 * num2;
+      else if (operation === "-") correctAnswer = num1 - num2;
+      else correctAnswer = num1 * num2;
       document.getElementById("question").textContent = `${num1} ${operation} ${num2} = ?`;
     }
     generateQuestion();
@@ -324,49 +245,36 @@
       const userAnswer = parseInt(inputValue);
       if (userAnswer === correctAnswer) {
         score++;
-        starsEarned++;
         document.getElementById("score").textContent = `Score: ${score}`;
-        document.getElementById("stars").textContent = `Stars: ★ ${starsEarned}`;
-        document.getElementById("feedback").textContent = "Great Job!";
-        updateMouth(true);
-        createParticles(faceGroup.position.x, faceGroup.position.y, faceGroup.position.z, 0xffff00);
+        face.classList.remove('sad');
+        face.classList.add('happy');
+        correctSound.play();
         generateQuestion();
         clearDisplay();
       } else {
-        document.getElementById("feedback").textContent = "Try Again!";
-        updateMouth(false);
-        let shake = 0;
-        const shakeInterval = setInterval(() => {
-          faceGroup.rotation.z = Math.sin(shake++ * 0.5) * 0.3;
-          if (shake > 20) {
-            clearInterval(shakeInterval);
-            faceGroup.rotation.z = 0;
-          }
-        }, 50);
+        score--;
+        document.getElementById("score").textContent = `Score: ${score}`;
+        face.classList.remove('happy');
+        face.classList.add('sad');
+        wrongSound.play();
+        clearDisplay();
+        face.style.animation = 'shake 0.5s';
+        setTimeout(() => face.style.animation = '', 500);
       }
     }
 
-    // Mode Selection
-    const modeButtons = document.querySelectorAll(".mode-button");
-    function setMode(newMode) {
-      mode = newMode;
-      modeButtons.forEach(btn => btn.classList.remove("selected"));
-      if (newMode === "add") modeButtons[0].classList.add("selected");
-      else if (newMode === "sub") modeButtons[1].classList.add("selected");
-      else modeButtons[2].classList.add("selected");
-      generateQuestion();
-      clearDisplay();
-    }
-    modeButtons[0].classList.add("selected"); // Default to addition
-
-    // Animation Loop
-    function animate() {
-      requestAnimationFrame(animate);
-      backgroundSphere.rotation.y += 0.002;
-      updateParticles();
-      renderer.render(scene, camera);
-    }
-    animate();
+    // Shake Animation
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+      @keyframes shake {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-8px); }
+        50% { transform: translateX(8px); }
+        75% { transform: translateX(-8px); }
+        100% { transform: translateX(0); }
+      }
+    `;
+    document.head.appendChild(styleSheet);
   </script>
 </body>
 </html>
